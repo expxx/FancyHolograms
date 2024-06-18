@@ -168,32 +168,14 @@ public final class HologramManagerImpl implements HologramManager {
 
             for (final var hologram : getHolograms()) {
                 HologramData data = hologram.getData();
-                if (data.hasChanges()) {
-                    hologram.forceUpdate();
-                    hologram.refreshForViewersInWorld();
-                    data.setHasChanges(false);
-
-                    if (data instanceof TextHologramData) {
-                        updateTimes.put(hologram.getData().getName(), time);
-                    }
-                } else if (data instanceof TextHologramData textData) {
-                    final var interval = textData.getTextUpdateInterval();
-                    if (interval < 1) {
-                        continue; // doesn't update
-                    }
-
-                    final var lastUpdate = updateTimes.asMap().get(data.getName());
-                    if (lastUpdate != null && time < (lastUpdate + interval)) {
-                        continue;
-                    }
-
-                    if (lastUpdate == null || time > (lastUpdate + interval)) {
-                        hologram.refreshForViewersInWorld();
-                        updateTimes.put(data.getName(), time);
-                    }
+                hologram.forceUpdate();
+                hologram.refreshForViewersInWorld();
+                data.setHasChanges(false);
+                if (data instanceof TextHologramData) {
+                    updateTimes.put(hologram.getData().getName(), time);
                 }
             }
-        }, 50, 1000, TimeUnit.MILLISECONDS);
+        }, 50, 5000, TimeUnit.MILLISECONDS);
     }
 
     /**
